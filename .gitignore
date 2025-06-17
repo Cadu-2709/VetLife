@@ -1,0 +1,17 @@
+# Yii 2
+/vendor/
+/runtime/
+/web/assets/
+
+# Arquivos de configuração local
+/config/db-local.php
+/config/web-local.php
+/config/params-local.php
+
+# Arquivos gerados por IDEs
+.idea/
+.vscode/
+
+# Arquivos de sistema
+.DS_Store
+Thumbs.db
