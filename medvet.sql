@@ -134,3 +134,9 @@ CREATE TRIGGER update_updated_at_client
 BEFORE UPDATE ON vetlife.user
 FOR EACH ROW
 EXECUTE FUNCTION vetlife.update_updated_at();
+
+
+INSERT INTO vetlife.scheduling_status (name) VALUES ('Agendado');
+INSERT INTO vetlife.scheduling_status (name) VALUES ('Confirmado');
+INSERT INTO vetlife.scheduling_status (name) VALUES ('Cancelado');
+INSERT INTO vetlife.scheduling_status (name) VALUES ('Realizado');

@@ -1,36 +1,38 @@
 <?php
-
 namespace app\controllers;
 
 use app\models\Veterinarian;
-use app\models\VeterinarianSearch; // Lembre-se de criar este ficheiro com o Gii
+use app\models\VeterinarianSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\filters\AccessControl;
 use Yii;
 
 class VeterinarianController extends Controller
 {
     public function behaviors()
     {
-        return array_merge(
-            parent::behaviors(),
-            [
-                'verbs' => [
-                    'class' => VerbFilter::class,
-                    'actions' => [
-                        'delete' => ['POST'],
+        return [
+            'access' => [
+                'class' => AccessControl::class,
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'matchCallback' => function ($rule, $action) {
+                            return !Yii::$app->user->isGuest && Yii::$app->user->identity->role === 'admin';
+                        }
                     ],
                 ],
-            ]
-        );
+            ],
+            'verbs' => ['class' => VerbFilter::class, 'actions' => ['delete' => ['POST']]],
+        ];
     }
-
+    
     public function actionIndex()
     {
         $searchModel = new VeterinarianSearch();
-        $dataProvider = $searchModel->search($this->request->queryParams);
-
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
@@ -47,16 +49,10 @@ class VeterinarianController extends Controller
     public function actionCreate()
     {
         $model = new Veterinarian();
-
-        if ($this->request->isPost) {
-            if ($model->load($this->request->post()) && $model->save()) {
-                Yii::$app->session->setFlash('success', 'Veterinário(a) registado(a) com sucesso.');
-                return $this->redirect(['view', 'id' => $model->id]);
-            }
-        } else {
-            $model->loadDefaultValues();
+        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
+            Yii::$app->session->setFlash('success', 'Veterinário(a) registado(a) com sucesso.');
+            return $this->redirect(['view', 'id' => $model->id]);
         }
-
         return $this->render('create', [
             'model' => $model,
         ]);
@@ -65,12 +61,10 @@ class VeterinarianController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-
         if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
             Yii::$app->session->setFlash('success', 'Dados do(a) veterinário(a) atualizados com sucesso.');
             return $this->redirect(['view', 'id' => $model->id]);
         }
-
         return $this->render('update', [
             'model' => $model,
         ]);
@@ -85,10 +79,9 @@ class VeterinarianController extends Controller
 
     protected function findModel($id)
     {
-        if (($model = Veterinarian::findOne(['id' => $id])) !== null) {
+        if (($model = Veterinarian::findOne($id)) !== null) {
             return $model;
         }
-
         throw new NotFoundHttpException('A página solicitada não existe.');
     }
 }

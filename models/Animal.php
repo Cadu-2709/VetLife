@@ -115,4 +115,17 @@ class Animal extends ActiveRecord
         $clients = Client::find()->orderBy('name')->asArray()->all();
         return ArrayHelper::map($clients, 'id', 'name');
     }
+
+        // ... (dentro da classe Animal)
+
+    /**
+     * Método auxiliar para obter uma lista de animais para dropdowns.
+     * @return array
+     */
+    public static function getAnimalList()
+    {
+        $animais = Animal::find()->orderBy('name')->asArray()->all();
+        return \yii\helpers\ArrayHelper::map($animais, 'id', 'name');
+    }
+
 }

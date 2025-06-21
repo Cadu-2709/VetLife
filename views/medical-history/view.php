@@ -1,44 +1,33 @@
 <?php
-
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 
-/** @var yii\web\View $this */
-/** @var app\models\MedicalHistory $model */
-
-$this->title = $model->id;
-$this->params['breadcrumbs'][] = ['label' => 'Medical Histories', 'url' => ['index']];
+$this->title = 'Histórico de ' . $model->animal->name;
+$this->params['breadcrumbs'][] = ['label' => 'Históricos Clínicos', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>
 <div class="medical-history-view">
-
     <h1><?= Html::encode($this->title) ?></h1>
-
     <p>
-        <?= Html::a('Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a('Delete', ['delete', 'id' => $model->id], [
+        <?= Html::a('Atualizar', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
+        <?= Html::a('Apagar', ['delete', 'id' => $model->id], [
             'class' => 'btn btn-danger',
-            'data' => [
-                'confirm' => 'Are you sure you want to delete this item?',
-                'method' => 'post',
-            ],
+            'data' => ['confirm' => 'Tem certeza que deseja apagar este item?', 'method' => 'post'],
         ]) ?>
     </p>
-
     <?= DetailView::widget([
         'model' => $model,
         'attributes' => [
             'id',
-            'id_animal',
-            'id_vet',
-            'date:ntext',
+            ['label' => 'Animal', 'value' => $model->animal->name],
+            ['label' => 'Veterinário', 'value' => $model->vet->name],
+            'date',
             'symptoms:ntext',
             'diagnosis:ntext',
             'treatment:ntext',
-            'created_at',
-            'updated_at',
+            'created_at:datetime',
+            'updated_at:datetime',
         ],
     ]) ?>
-
 </div>

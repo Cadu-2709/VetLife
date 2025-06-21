@@ -1,36 +1,26 @@
 <?php
-
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 
-/** @var yii\web\View $this */
-/** @var app\models\Animal $model */
-
-$this->title = $model->name;
-$this->params['breadcrumbs'][] = ['label' => 'Animals', 'url' => ['index']];
+$this->title = 'Animal: ' . $model->name;
+$this->params['breadcrumbs'][] = ['label' => 'Animais', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>
 <div class="animal-view">
-
     <h1><?= Html::encode($this->title) ?></h1>
-
     <p>
-        <?= Html::a('Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a('Delete', ['delete', 'id' => $model->id], [
+        <?= Html::a('Atualizar', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
+        <?= Html::a('Apagar', ['delete', 'id' => $model->id], [
             'class' => 'btn btn-danger',
-            'data' => [
-                'confirm' => 'Are you sure you want to delete this item?',
-                'method' => 'post',
-            ],
+            'data' => ['confirm' => 'Tem certeza que deseja apagar este item?', 'method' => 'post'],
         ]) ?>
     </p>
-
     <?= DetailView::widget([
         'model' => $model,
         'attributes' => [
             'id',
-            'id_client',
+            ['label' => 'Tutor', 'value' => $model->client->name],
             'name',
             'species',
             'race',
@@ -38,9 +28,8 @@ $this->params['breadcrumbs'][] = $this->title;
             'color',
             'weight',
             'obs:ntext',
-            'created_at',
-            'updated_at',
+            'created_at:datetime',
+            'updated_at:datetime',
         ],
     ]) ?>
-
 </div>

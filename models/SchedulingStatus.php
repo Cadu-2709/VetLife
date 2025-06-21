@@ -39,4 +39,15 @@ class SchedulingStatus extends ActiveRecord
     {
         return $this->hasMany(Scheduling::class, ['id_status' => 'id']);
     }
+        // ... (dentro da classe SchedulingStatus)
+
+    /**
+     * Método auxiliar para obter uma lista de status para dropdowns.
+     * @return array
+     */
+    public static function getStatusList()
+    {
+        $status = SchedulingStatus::find()->orderBy('name')->asArray()->all();
+        return \yii\helpers\ArrayHelper::map($status, 'id', 'name');
+    }
 }
