@@ -1,39 +1,42 @@
 <?php
-
 namespace app\controllers;
 
 use app\models\MedicalHistory;
-use app\models\MedicalHistorySearch; // Lembre-se de criar este ficheiro com o Gii
+use app\models\MedicalHistorySearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\filters\AccessControl;
 use Yii;
 
-/**
- * MedicalHistoryController implementa as ações CRUD para o modelo MedicalHistory.
- */
 class MedicalHistoryController extends Controller
 {
     public function behaviors()
     {
-        return array_merge(
-            parent::behaviors(),
-            [
-                'verbs' => [
-                    'class' => VerbFilter::class,
-                    'actions' => [
-                        'delete' => ['POST'],
+        return [
+            'access' => [
+                'class' => AccessControl::class,
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'matchCallback' => function ($rule, $action) {
+                            if (Yii::$app->user->isGuest) {
+                                return false;
+                            }
+                            $role = Yii::$app->user->identity->role;
+                            return $role === 'admin' || $role === 'veterinario';
+                        }
                     ],
                 ],
-            ]
-        );
+            ],
+            'verbs' => ['class' => VerbFilter::class, 'actions' => ['delete' => ['POST']]],
+        ];
     }
-
+    
     public function actionIndex()
     {
         $searchModel = new MedicalHistorySearch();
-        $dataProvider = $searchModel->search($this->request->queryParams);
-
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
@@ -49,7 +52,10 @@ class MedicalHistoryController extends Controller
 
     public function actionCreate()
     {
-        $model = new MedicalHistory();
+        $model = new \app\models\MedicalHistory();
+
+        // Define a data atual como valor padrão
+        $model->date = date('Y-m-d');
 
         if ($this->request->isPost) {
             if ($model->load($this->request->post()) && $model->save()) {
@@ -58,6 +64,10 @@ class MedicalHistoryController extends Controller
             }
         } else {
             $model->loadDefaultValues();
+            // Garante que a data padrão seja mantida se o formulário não for postado
+            if (empty($model->date)) {
+                 $model->date = date('Y-m-d');
+            }
         }
 
         return $this->render('create', [
@@ -68,12 +78,10 @@ class MedicalHistoryController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-
         if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
             Yii::$app->session->setFlash('success', 'Histórico clínico atualizado com sucesso.');
             return $this->redirect(['view', 'id' => $model->id]);
         }
-
         return $this->render('update', [
             'model' => $model,
         ]);
@@ -88,10 +96,9 @@ class MedicalHistoryController extends Controller
 
     protected function findModel($id)
     {
-        if (($model = MedicalHistory::findOne(['id' => $id])) !== null) {
+        if (($model = MedicalHistory::findOne($id)) !== null) {
             return $model;
         }
-
         throw new NotFoundHttpException('A página solicitada não existe.');
     }
 }

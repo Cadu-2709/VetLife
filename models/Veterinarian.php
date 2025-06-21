@@ -80,4 +80,13 @@ class Veterinarian extends ActiveRecord
     {
         return $this->hasMany(Scheduling::class, ['id_vet' => 'id']);
     }
+    /**
+     * Método auxiliar para obter uma lista de veterinários para dropdowns.
+     * @return array
+     */
+    public static function getVeterinarianList()
+    {
+        $vets = Veterinarian::find()->orderBy('name')->asArray()->all();
+        return \yii\helpers\ArrayHelper::map($vets, 'id', 'name');
+    }
 }

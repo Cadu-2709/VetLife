@@ -20,6 +20,9 @@ use yii\db\Expression;
  */
 class User extends ActiveRecord implements IdentityInterface
 {
+    // Propriedade virtual para receber a password do formulário
+    public $password;
+
     public static function tableName()
     {
         return 'vetlife.user';
@@ -42,9 +45,13 @@ class User extends ActiveRecord implements IdentityInterface
     public function rules()
     {
         return [
-            [['email', 'pwd_hash', 'role'], 'required'],
+            [['email', 'role'], 'required'],
+            // A regra para 'pwd_hash' é removida daqui porque será gerada
+            [['pwd_hash'], 'string', 'max' => 255], 
+            // A regra para a password virtual é adicionada
+            [['password'], 'required', 'on' => 'create'], // A password é obrigatória apenas na criação
+            [['password'], 'string', 'min' => 6], // Exemplo de regra de password
             [['email'], 'string', 'max' => 100],
-            [['pwd_hash'], 'string', 'max' => 255],
             [['role'], 'string', 'max' => 50],
             [['email'], 'unique'],
             ['email', 'email'],
@@ -56,7 +63,8 @@ class User extends ActiveRecord implements IdentityInterface
         return [
             'id' => 'ID',
             'email' => 'E-mail',
-            'pwd_hash' => 'Hash da Senha',
+            'password' => 'Palavra-passe', // Label para a password virtual
+            'pwd_hash' => 'Hash da Palavra-passe',
             'role' => 'Função',
             'created_at' => 'Criado em',
             'updated_at' => 'Atualizado em',
@@ -73,7 +81,6 @@ class User extends ActiveRecord implements IdentityInterface
     {
         return null; // Não usaremos token de acesso neste projeto
     }
-
 
     public function getId()
     {

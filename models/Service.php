@@ -67,6 +67,18 @@ class Service extends ActiveRecord
 
     public function getSchedulings()
     {
-        return $this->hasMany(Scheduling::class, ['id_service' => 'id']);
-    }
+        // CORREÇÃO: Faltava o '=>' na definição da relação.
+        return $this->hasMany(Scheduling::class, ['id_service' => 'id']);
+    }
+       // ... (dentro da classe Service)
+
+    /**
+     * Método auxiliar para obter uma lista de serviços para dropdowns.
+     * @return array
+     */
+    public static function getServiceList()
+    {
+        $services = Service::find()->orderBy('name')->asArray()->all();
+        return \yii\helpers\ArrayHelper::map($services, 'id', 'name');
+    }
 }

@@ -3,6 +3,9 @@
 namespace app\models;
 
 use Yii;
+use yii\db\ActiveRecord;
+use yii\behaviors\TimestampBehavior;
+use yii\db\Expression;
 
 /**
  * This is the model class for table "vetlife.client".
@@ -17,37 +20,47 @@ use Yii;
  *
  * @property Animal[] $animals
  */
-class Client extends \yii\db\ActiveRecord
+class Client extends ActiveRecord
 {
-    /**
-     * {@inheritdoc}
-     */
     public static function tableName()
     {
         return 'vetlife.client';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    public function behaviors()
+    {
+        return [
+            [
+                'class' => TimestampBehavior::class,
+                'attributes' => [
+                    ActiveRecord::EVENT_BEFORE_INSERT => ['created_at', 'updated_at'],
+                    ActiveRecord::EVENT_BEFORE_UPDATE => ['updated_at'],
+                ],
+                'value' => new Expression('NOW()'),
+            ],
+        ];
+    }
+
     public function rules()
     {
         return [
             [['name', 'email', 'phone', 'cpf'], 'required'],
-            [['created_at', 'updated_at'], 'safe'],
+            
+            // ADICIONADO: Remove caracteres não numéricos do CPF antes da validação
+            ['cpf', 'filter', 'filter' => function ($value) {
+                return preg_replace('/[^0-9]/', '', $value);
+            }],
+
             [['name'], 'string', 'max' => 255],
             [['email'], 'string', 'max' => 100],
             [['phone'], 'string', 'max' => 20],
-            [['cpf'], 'string', 'max' => 11],
+            [['cpf'], 'string', 'max' => 11], // Esta regra agora funcionará corretamente
             [['email'], 'unique'],
             [['cpf'], 'unique'],
-            [['email'], 'email'],
+            ['email', 'email'],
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function attributeLabels()
     {
         return [
@@ -62,8 +75,6 @@ class Client extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[Animals]].
-     *
      * @return \yii\db\ActiveQuery
      */
     public function getAnimals()

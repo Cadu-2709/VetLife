@@ -6,14 +6,14 @@ use Yii;
 use yii\base\Model;
 
 /**
- * LoginForm is the model behind the login form.
+ * LoginForm é o modelo por trás do formulário de login.
  *
  * @property-read User|null $user
  *
  */
 class LoginForm extends Model
 {
-    public $username;
+    public $email;
     public $password;
     public $rememberMe = true;
 
@@ -21,26 +21,33 @@ class LoginForm extends Model
 
 
     /**
-     * @return array the validation rules.
+     * @return array as regras de validação.
      */
     public function rules()
     {
         return [
-            // username and password are both required
-            [['username', 'password'], 'required'],
-            // rememberMe must be a boolean value
+            [['email', 'password'], 'required'],
+            ['email', 'email'],
             ['rememberMe', 'boolean'],
-            // password is validated by validatePassword()
             ['password', 'validatePassword'],
+        ];
+    }
+    
+    public function attributeLabels()
+    {
+        return [
+            'email' => 'E-mail',
+            'password' => 'Palavra-passe',
+            'rememberMe' => 'Lembrar-se de mim',
         ];
     }
 
     /**
-     * Validates the password.
-     * This method serves as the inline validation for password.
+     * Valida a palavra-passe.
+     * Este método serve como a validação inline para a palavra-passe.
      *
-     * @param string $attribute the attribute currently being validated
-     * @param array $params the additional name-value pairs given in the rule
+     * @param string $attribute o atributo a ser validado
+     * @param array $params os parâmetros adicionais dados à regra
      */
     public function validatePassword($attribute, $params)
     {
@@ -48,14 +55,14 @@ class LoginForm extends Model
             $user = $this->getUser();
 
             if (!$user || !$user->validatePassword($this->password)) {
-                $this->addError($attribute, 'Incorrect username or password.');
+                $this->addError($attribute, 'E-mail ou palavra-passe incorretos.');
             }
         }
     }
 
     /**
-     * Logs in a user using the provided username and password.
-     * @return bool whether the user is logged in successfully
+     * Efetua o login de um utilizador usando o email e a palavra-passe fornecidos.
+     * @return bool se o utilizador foi logado com sucesso
      */
     public function login()
     {
@@ -66,14 +73,14 @@ class LoginForm extends Model
     }
 
     /**
-     * Finds user by [[username]]
+     * Encontra o utilizador pelo [[email]]
      *
      * @return User|null
      */
     public function getUser()
     {
         if ($this->_user === false) {
-            $this->_user = User::findByUsername($this->username);
+            $this->_user = User::findOne(['email' => $this->email]);
         }
 
         return $this->_user;
