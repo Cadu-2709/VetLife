@@ -43,7 +43,7 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
     } else {
         $userRole = Yii::$app->user->identity->role;
         $menuItems = [
-            ['label' => 'Dashboard', 'url' => ['/site/index']],
+            ['label' => 'Home', 'url' => ['/site/index']],
             ['label' => 'Agendamentos', 'url' => ['/scheduling/index']],
             ['label' => 'Animais', 'url' => ['/animal/index']],
             ['label' => 'Histórico Clínico', 'url' => ['/medical-history/index'], 'visible' => ($userRole === 'admin' || $userRole === 'veterinario')],
