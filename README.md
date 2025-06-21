@@ -1,233 +1,44 @@
-<p align="center">
-    <a href="https://github.com/yiisoft" target="_blank">
-        <img src="https://avatars0.githubusercontent.com/u/993323" height="100px">
-    </a>
-    <h1 align="center">Yii 2 Basic Project Template</h1>
-    <br>
-</p>
+Manual de Instalação e Deployment do Sistema VetLifeEste guia fornece as instruções completas para instalar o sistema VetLife num ambiente de desenvolvimento local e para o configurar num servidor de produção, tornando-o acessível para múltiplos utilizadores.Parte 1: Requisitos do SistemaAntes de começar, certifique-se de que a máquina (seja local ou o servidor) tem o seguinte software instalado:Servidor Web: Apache (recomendado) ou Nginx.PHP: Versão 8.0 ou superior, com as seguintes extensões ativadas:pdo_pgsql (para a ligação com o PostgreSQL)mbstringintlBanco de Dados: PostgreSQL versão 12 ou superior.Composer: O gestor de dependências do PHP.Git: Para clonar o repositório do projeto.Parte 2: Instalação em Ambiente de Desenvolvimento LocalSiga estes passos para configurar o projeto na sua própria máquina para testes ou para continuar o desenvolvimento.Passo 2.1: Obter o Código-FonteAbra o terminal e clone o repositório do projeto a partir do GitHub para a pasta de projetos do seu servidor web (ex: C:/xampp/htdocs/ ou /var/www/html/).# Substitua pela URL do seu repositório
+git clone https://github.com/Cadu-2709/VetLife.git
 
-Yii 2 Basic Project Template is a skeleton [Yii 2](https://www.yiiframework.com/) application best for
-rapidly creating small projects.
-
-The template contains the basic features including user login/logout and a contact page.
-It includes all commonly used configurations that would allow you to focus on adding new
-features to your application.
-
-[![Latest Stable Version](https://img.shields.io/packagist/v/yiisoft/yii2-app-basic.svg)](https://packagist.org/packages/yiisoft/yii2-app-basic)
-[![Total Downloads](https://img.shields.io/packagist/dt/yiisoft/yii2-app-basic.svg)](https://packagist.org/packages/yiisoft/yii2-app-basic)
-[![build](https://github.com/yiisoft/yii2-app-basic/workflows/build/badge.svg)](https://github.com/yiisoft/yii2-app-basic/actions?query=workflow%3Abuild)
-
-DIRECTORY STRUCTURE
--------------------
-
-      assets/             contains assets definition
-      commands/           contains console commands (controllers)
-      config/             contains application configurations
-      controllers/        contains Web controller classes
-      mail/               contains view files for e-mails
-      models/             contains model classes
-      runtime/            contains files generated during runtime
-      tests/              contains various tests for the basic application
-      vendor/             contains dependent 3rd-party packages
-      views/              contains view files for the Web application
-      web/                contains the entry script and Web resources
-
-
-
-REQUIREMENTS
-------------
-
-The minimum requirement by this project template that your Web server supports PHP 7.4.
-
-
-INSTALLATION
-------------
-
-### Install via Composer
-
-If you do not have [Composer](https://getcomposer.org/), you may install it by following the instructions
-at [getcomposer.org](https://getcomposer.org/doc/00-intro.md#installation-nix).
-
-You can then install this project template using the following command:
-
-~~~
-composer create-project --prefer-dist yiisoft/yii2-app-basic basic
-~~~
-
-Now you should be able to access the application through the following URL, assuming `basic` is the directory
-directly under the Web root.
-
-~~~
-http://localhost/basic/web/
-~~~
-
-### Install from an Archive File
-
-Extract the archive file downloaded from [yiiframework.com](https://www.yiiframework.com/download/) to
-a directory named `basic` that is directly under the Web root.
-
-Set cookie validation key in `config/web.php` file to some random secret string:
-
-```php
-'request' => [
-    // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
-    'cookieValidationKey' => '<secret random string goes here>',
-],
-```
-
-You can then access the application through the following URL:
-
-~~~
-http://localhost/basic/web/
-~~~
-
-
-### Install with Docker
-
-Update your vendor packages
-
-    docker-compose run --rm php composer update --prefer-dist
-    
-Run the installation triggers (creating cookie validation code)
-
-    docker-compose run --rm php composer install    
-    
-Start the container
-
-    docker-compose up -d
-    
-You can then access the application through the following URL:
-
-    http://127.0.0.1:8000
-
-**NOTES:** 
-- Minimum required Docker engine version `17.04` for development (see [Performance tuning for volume mounts](https://docs.docker.com/docker-for-mac/osxfs-caching/))
-- The default configuration uses a host-volume in your home directory `.docker-composer` for composer caches
-
-
-CONFIGURATION
--------------
-
-### Database
-
-Edit the file `config/db.php` with real data, for example:
-
-```php
-return [
+# Navegue para a pasta do projeto
+cd VetLife
+Passo 2.2: Instalar as Dependências do ProjetoUse o Composer para instalar todas as bibliotecas e o framework Yii2.composer install
+Passo 2.3: Configurar o Banco de DadosCrie a Base de Dados: Usando o pgAdmin ou a linha de comando, crie uma base de dados vazia (ex: vetlife_db).Execute o Script SQL Inicial: Execute o script SQL que contém a criação do schema vetlife e de todas as tabelas (client, animal, etc.).Configure a Conexão: Copie o ficheiro /config/db.php.dist para /config/db.php (se existir um .dist) e edite o /config/db.php com os seus dados de acesso ao PostgreSQL:return [
     'class' => 'yii\db\Connection',
-    'dsn' => 'mysql:host=localhost;dbname=yii2basic',
-    'username' => 'root',
-    'password' => '1234',
+    'dsn' => 'pgsql:host=localhost;dbname=vetlife_db',
+    'username' => 'seu_usuario_postgres',
+    'password' => 'sua_senha',
     'charset' => 'utf8',
 ];
-```
+Passo 2.4: Executar as MigrationsAs migrations irão configurar tabelas adicionais e, mais importante, criar o utilizador administrador padrão.php yii migrate
+Quando perguntado, digite yes e pressione Enter para aplicar a migration.Passo 2.5: Iniciar o Servidor de DesenvolvimentoPara testar localmente, use o servidor embutido do Yii2.php yii serve
+O sistema estará agora acessível em http://localhost:8080.Parte 3: Configuração para Produção (Acesso na Rede/Internet)Para que outras pessoas possam utilizar o sistema através do IP da máquina ou de um domínio, não se deve usar o php yii serve. É necessário configurar o servidor web (Apache).Passo 3.1: Configurar o Servidor Web (Exemplo para Apache)É preciso criar um "Virtual Host" que aponte para a pasta /web do seu projeto, que é o ponto de entrada público e seguro do Yii2.Edite o ficheiro de configuração de hosts do Apache (ex: httpd-vhosts.conf).Adicione o seguinte bloco, ajustando os caminhos para a sua realidade:<VirtualHost *:80>
+    ServerName vetlife.local # Ou o IP do servidor: 192.168.3.91
+    DocumentRoot "C:/xampp/htdocs/VetLife/web"
 
-**NOTES:**
-- Yii won't create the database for you, this has to be done manually before you can access it.
-- Check and edit the other files in the `config/` directory to customize your application as required.
-- Refer to the README in the `tests` directory for information specific to basic application tests.
+    <Directory "C:/xampp/htdocs/VetLife/web">
+        # Permite o uso de URLs amigáveis (pretty URLs)
+        AllowOverride All
+        Require all granted
+    </Directory>
 
+    ErrorLog "C:/xampp/apache/logs/vetlife-error.log"
+    CustomLog "C:/xampp/apache/logs/vetlife-access.log" common
+</VirtualHost>
+Reinicie o serviço do Apache para que as alterações tenham efeito.Passo 3.2: Ajustes de Segurança e Performance do Yii2Desativar o Modo de Debug: No ficheiro /web/index.php, altere o valor da constante YII_DEBUG para false. Isto é crucial para a segurança.defined('YII_DEBUG') or define('YII_DEBUG', false);
+defined('YII_ENV') or define('YII_ENV', 'prod');
+Ativar URLs Amigáveis (Opcional): Para ter URLs como /client/create em vez de /index.php?r=client/create, adicione o seguinte ao seu ficheiro /config/web.php, dentro da secção components:'urlManager' => [
+    'enablePrettyUrl' => true,
+    'showScriptName' => false,
+    'rules' => [
+    ],
+],
+Passo 3.3: Permissões de Ficheiros (Importante!)O servidor web precisa de permissão para escrever em duas pastas específicas para poder gerir assets (CSS, JS) e logs. Num ambiente Linux, os comandos seriam:# Dar permissão ao servidor web (www-data) para escrever nas pastas
+sudo chown -R www-data:www-data /caminho/para/VetLife/runtime
+sudo chown -R www-data:www-data /caminho/para/VetLife/web/assets
 
-TESTING
--------
-
-Tests are located in `tests` directory. They are developed with [Codeception PHP Testing Framework](https://codeception.com/).
-By default, there are 3 test suites:
-
-- `unit`
-- `functional`
-- `acceptance`
-
-Tests can be executed by running
-
-```
-vendor/bin/codecept run
-```
-
-The command above will execute unit and functional tests. Unit tests are testing the system components, while functional
-tests are for testing user interaction. Acceptance tests are disabled by default as they require additional setup since
-they perform testing in real browser. 
-
-
-### Running  acceptance tests
-
-To execute acceptance tests do the following:  
-
-1. Rename `tests/acceptance.suite.yml.example` to `tests/acceptance.suite.yml` to enable suite configuration
-
-2. Replace `codeception/base` package in `composer.json` with `codeception/codeception` to install full-featured
-   version of Codeception
-
-3. Update dependencies with Composer 
-
-    ```
-    composer update  
-    ```
-
-4. Download [Selenium Server](https://www.seleniumhq.org/download/) and launch it:
-
-    ```
-    java -jar ~/selenium-server-standalone-x.xx.x.jar
-    ```
-
-    In case of using Selenium Server 3.0 with Firefox browser since v48 or Google Chrome since v53 you must download [GeckoDriver](https://github.com/mozilla/geckodriver/releases) or [ChromeDriver](https://sites.google.com/a/chromium.org/chromedriver/downloads) and launch Selenium with it:
-
-    ```
-    # for Firefox
-    java -jar -Dwebdriver.gecko.driver=~/geckodriver ~/selenium-server-standalone-3.xx.x.jar
-    
-    # for Google Chrome
-    java -jar -Dwebdriver.chrome.driver=~/chromedriver ~/selenium-server-standalone-3.xx.x.jar
-    ``` 
-    
-    As an alternative way you can use already configured Docker container with older versions of Selenium and Firefox:
-    
-    ```
-    docker run --net=host selenium/standalone-firefox:2.53.0
-    ```
-
-5. (Optional) Create `yii2basic_test` database and update it by applying migrations if you have them.
-
-   ```
-   tests/bin/yii migrate
-   ```
-
-   The database configuration can be found at `config/test_db.php`.
-
-
-6. Start web server:
-
-    ```
-    tests/bin/yii serve
-    ```
-
-7. Now you can run all available tests
-
-   ```
-   # run all available tests
-   vendor/bin/codecept run
-
-   # run acceptance tests
-   vendor/bin/codecept run acceptance
-
-   # run only unit and functional tests
-   vendor/bin/codecept run unit,functional
-   ```
-
-### Code coverage support
-
-By default, code coverage is disabled in `codeception.yml` configuration file, you should uncomment needed rows to be able
-to collect code coverage. You can run your tests and collect coverage with the following command:
-
-```
-#collect coverage for all tests
-vendor/bin/codecept run --coverage --coverage-html --coverage-xml
-
-#collect coverage only for unit tests
-vendor/bin/codecept run unit --coverage --coverage-html --coverage-xml
-
-#collect coverage for unit and functional tests
-vendor/bin/codecept run functional,unit --coverage --coverage-html --coverage-xml
-```
-
-You can see code coverage output under the `tests/_output` directory.
+# Garantir que as permissões estão corretas
+sudo chmod -R 775 /caminho/para/VetLife/runtime
+sudo chmod -R 775 /caminho/para/VetLife/web/assets
+Passo 3.4: Aceder ao SistemaCom tudo configurado, outras pessoas na mesma rede poderão aceder ao sistema através do endereço IP do servidor (ex: http://192.168.3.91). Se configurou um domínio, utilize-o.O login padrão criado pela migration é:Email: admin@vetlife.comPalavra-passe: admin

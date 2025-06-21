@@ -1,23 +1,15 @@
 <?php
-
-/** @var yii\web\View $this */
-/** @var string $content */
-
 use app\assets\AppAsset;
-use app\widgets\Alert; // Importante adicionar o widget Alert
+use app\widgets\Alert;
 use yii\bootstrap5\Breadcrumbs;
 use yii\bootstrap5\Html;
 use yii\bootstrap5\Nav;
 use yii\bootstrap5\NavBar;
 
 AppAsset::register($this);
-
 $this->registerCsrfMetaTags();
 $this->registerMetaTag(['charset' => Yii::$app->charset], 'charset');
 $this->registerMetaTag(['name' => 'viewport', 'content' => 'width=device-width, initial-scale=1, shrink-to-fit=no']);
-$this->registerMetaTag(['name' => 'description', 'content' => $this->params['meta_description'] ?? '']);
-$this->registerMetaTag(['name' => 'keywords', 'content' => $this->params['meta_keywords'] ?? '']);
-$this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii::getAlias('@web/favicon.ico')]);
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
@@ -32,33 +24,54 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
 <header id="header">
     <?php
     NavBar::begin([
-        'brandLabel' => 'VetLife',
+    'brandLabel' => NavBar::begin([
+    'brandLabel' => Html::img('@web/images/logo.png', ['alt' => 'VetLife', 'height' => '40']),
+    'brandUrl' => Yii::$app->homeUrl,
+    'options' => ['class' => 'navbar-expand-md navbar-dark bg-dark fixed-top'],
+]);
+
         'brandUrl' => Yii::$app->homeUrl,
-        'options' => ['class' => 'navbar-expand-md navbar-dark bg-dark fixed-top']
+        'options' => ['class' => 'navbar-expand-md navbar-dark bg-dark fixed-top'],
     ]);
-    echo Nav::widget([
-        'options' => ['class' => 'navbar-nav'],
-        'items' => [
-            ['label' => 'Início', 'url' => ['/site/index']],
-            ['label' => 'Clientes', 'url' => ['/client/index']],
-            ['label' => 'Animais', 'url' => ['/animal/index']],
-            ['label' => 'Veterinários', 'url' => ['/veterinarian/index']],
+
+    $menuItems = [];
+    if (Yii::$app->user->isGuest) {
+        $menuItems[] = ['label' => 'Login', 'url' => ['/site/login']];
+    } else {
+        $userRole = Yii::$app->user->identity->role;
+        $menuItems = [
+            ['label' => 'Home', 'url' => ['/site/index']],
             ['label' => 'Agendamentos', 'url' => ['/scheduling/index']],
-        ]
-    ]);
+            ['label' => 'Animais', 'url' => ['/animal/index']],
+            ['label' => 'Histórico Clínico', 'url' => ['/medical-history/index'], 'visible' => ($userRole === 'admin' || $userRole === 'veterinario')],
+            ['label' => 'Clientes', 'url' => ['/client/index'], 'visible' => ($userRole === 'admin' || $userRole === 'recepcionista')],
+            [
+                'label' => 'Administração',
+                'visible' => ($userRole === 'admin'),
+                'items' => [
+                     ['label' => 'Serviços', 'url' => ['/service/index']],
+                     ['label' => 'Veterinários', 'url' => ['/veterinarian/index']],
+                     ['label' => 'Utilizadores', 'url' => ['/user/index']],
+                     '<div class="dropdown-divider"></div>',
+                     ['label' => 'Status de Agendamento', 'url' => ['/scheduling-status/index']],
+                ],
+            ],
+        ];
+        $menuItems[] = '<li class="nav-item">'
+            . Html::beginForm(['/site/logout'])
+            . Html::submitButton('Logout ('.Yii::$app->user->identity->email.')', ['class' => 'nav-link btn btn-link logout text-white'])
+            . Html::endForm()
+            . '</li>';
+    }
+    echo Nav::widget(['options' => ['class' => 'navbar-nav ms-auto mb-2 mb-md-0'], 'items' => $menuItems]);
     NavBar::end();
     ?>
 </header>
 
 <main id="main" class="flex-shrink-0" role="main">
-    <div class="container">
-        <?php if (!empty($this->params['breadcrumbs'])): ?>
-            <?= Breadcrumbs::widget(['links' => $this->params['breadcrumbs']]) ?>
-        <?php endif ?>
-        
-        <!-- CÓDIGO PARA EXIBIR A MENSAGEM DE SUCESSO -->
+    <div class="container" style="padding-top: 70px;">
+        <?= !empty($this->params['breadcrumbs']) ? Breadcrumbs::widget(['links' => $this->params['breadcrumbs']]) : '' ?>
         <?= Alert::widget() ?>
-        
         <?= $content ?>
     </div>
 </main>
@@ -66,7 +79,7 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
 <footer id="footer" class="mt-auto py-3 bg-light">
     <div class="container">
         <div class="row text-muted">
-            <div class="col-md-6 text-center text-md-start">&copy; VetLife <?= date('Y') ?></div>
+            <div class="col-md-6 text-center text-md-start">&copy; Unoesc <?= date('Y') ?></div>
             <div class="col-md-6 text-center text-md-end"><?= Yii::powered() ?></div>
         </div>
     </div>
@@ -75,4 +88,4 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
 <?php $this->endBody() ?>
 </body>
 </html>
-<?php $this->endPage() ?>
+<?php $this->endPage() ?>
