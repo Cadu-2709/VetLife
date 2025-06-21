@@ -5,6 +5,7 @@
 
 use app\assets\AppAsset;
 use app\widgets\Alert;
+use app\helpers\AuthHelper;
 use yii\bootstrap5\Breadcrumbs;
 use yii\bootstrap5\Html;
 use yii\bootstrap5\Nav;
@@ -41,16 +42,15 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
     if (Yii::$app->user->isGuest) {
         $menuItems[] = ['label' => 'Login', 'url' => ['/site/login']];
     } else {
-        $userRole = Yii::$app->user->identity->role;
         $menuItems = [
             ['label' => 'Home', 'url' => ['/site/index']],
-            ['label' => 'Agendamentos', 'url' => ['/scheduling/index']],
-            ['label' => 'Animais', 'url' => ['/animal/index']],
-            ['label' => 'Histórico Clínico', 'url' => ['/medical-history/index'], 'visible' => ($userRole === 'admin' || $userRole === 'veterinario')],
-            ['label' => 'Clientes', 'url' => ['/client/index'], 'visible' => ($userRole === 'admin' || $userRole === 'recepcionista')],
+            ['label' => 'Agendamentos', 'url' => ['/scheduling/index'], 'visible' => AuthHelper::can('scheduling.index')],
+            ['label' => 'Animais', 'url' => ['/animal/index'], 'visible' => AuthHelper::can('animal.index')],
+            ['label' => 'Histórico Clínico', 'url' => ['/medical-history/index'], 'visible' => AuthHelper::can('medical-history.index')],
+            ['label' => 'Clientes', 'url' => ['/client/index'], 'visible' => AuthHelper::can('client.index')],
             [
                 'label' => 'Administração',
-                'visible' => ($userRole === 'admin'),
+                'visible' => AuthHelper::isAdmin(),
                 'items' => [
                      ['label' => 'Serviços', 'url' => ['/service/index']],
                      ['label' => 'Veterinários', 'url' => ['/veterinarian/index']],
@@ -62,7 +62,7 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
         ];
         $menuItems[] = '<li class="nav-item">'
             . Html::beginForm(['/site/logout'])
-            . Html::submitButton('Logout (' . Yii::$app->user->identity->email . ')', ['class' => 'nav-link btn btn-link logout text-white'])
+            . Html::submitButton('Logout (' . Yii::$app->user->identity->email . ' - ' . AuthHelper::getCurrentRoleName() . ')', ['class' => 'nav-link btn btn-link logout text-white'])
             . Html::endForm()
             . '</li>';
     }

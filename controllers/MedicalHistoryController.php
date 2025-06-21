@@ -3,35 +3,32 @@ namespace app\controllers;
 
 use app\models\MedicalHistory;
 use app\models\MedicalHistorySearch;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
-use yii\filters\AccessControl;
 use Yii;
 
-class MedicalHistoryController extends Controller
+class MedicalHistoryController extends BaseController
 {
-    public function behaviors()
-    {
-        return [
-            'access' => [
-                'class' => AccessControl::class,
-                'rules' => [
-                    [
-                        'allow' => true,
-                        'matchCallback' => function ($rule, $action) {
-                            if (Yii::$app->user->isGuest) {
-                                return false;
-                            }
-                            $role = Yii::$app->user->identity->role;
-                            return $role === 'admin' || $role === 'veterinario';
-                        }
-                    ],
-                ],
-            ],
-            'verbs' => ['class' => VerbFilter::class, 'actions' => ['delete' => ['POST']]],
-        ];
-    }
+    /**
+     * @inheritdoc
+     */
+    protected $permissions = [
+        'index' => ['admin', 'veterinarian', 'client'],
+        'view' => ['admin', 'veterinarian', 'client'],
+        'create' => ['admin', 'veterinarian'],
+        'update' => ['admin', 'veterinarian'],
+        'delete' => ['admin'],
+    ];
+
+    /**
+     * @inheritdoc
+     */
+    protected $customErrorMessages = [
+        'index' => 'Você não tem permissão para visualizar histórico clínico.',
+        'view' => 'Você não tem permissão para visualizar este histórico clínico.',
+        'create' => 'Apenas veterinários e administradores podem criar registos de histórico clínico.',
+        'update' => 'Apenas veterinários e administradores podem editar histórico clínico.',
+        'delete' => 'Apenas administradores podem remover registos de histórico clínico.',
+    ];
     
     public function actionIndex()
     {

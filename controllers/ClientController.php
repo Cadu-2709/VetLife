@@ -3,35 +3,28 @@ namespace app\controllers;
 
 use app\models\Client;
 use app\models\ClientSearch;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
-use yii\filters\AccessControl;
 use Yii;
 
-class ClientController extends Controller
+class ClientController extends BaseController
 {
-    public function behaviors()
-    {
-        return [
-            'access' => [
-                'class' => AccessControl::class,
-                'rules' => [
-                    [
-                        'allow' => true,
-                        'matchCallback' => function ($rule, $action) {
-                            if (Yii::$app->user->isGuest) {
-                                return false;
-                            }
-                            $role = Yii::$app->user->identity->role;
-                            return $role === 'admin' || $role === 'recepcionista';
-                        }
-                    ],
-                ],
-            ],
-            'verbs' => ['class' => VerbFilter::class, 'actions' => ['delete' => ['POST']]],
-        ];
-    }
+    /**
+     * @inheritdoc
+     */
+    protected $permissions = [
+        '*' => ['admin', 'receptionist'], // Todas as ações requerem admin ou recepcionista
+    ];
+
+    /**
+     * @inheritdoc
+     */
+    protected $customErrorMessages = [
+        'index' => 'Apenas administradores e recepcionistas podem visualizar a lista de clientes.',
+        'view' => 'Apenas administradores e recepcionistas podem visualizar dados de clientes.',
+        'create' => 'Apenas administradores e recepcionistas podem cadastrar novos clientes.',
+        'update' => 'Apenas administradores e recepcionistas podem editar dados de clientes.',
+        'delete' => 'Apenas administradores e recepcionistas podem remover clientes do sistema.',
+    ];
     
     public function actionIndex()
     {

@@ -34,7 +34,7 @@ CREATE TABLE vetlife.veterinarian (
 	updated_at TIMESTAMP
 );
 
-CREATE TRIGGER update_updated_at_client
+CREATE TRIGGER update_updated_at_veterinarian
 BEFORE UPDATE ON vetlife.veterinarian
 FOR EACH ROW
 EXECUTE FUNCTION vetlife.update_updated_at();
@@ -49,7 +49,7 @@ CREATE TABLE vetlife.service (
 	updated_at TIMESTAMP
 );
 
-CREATE TRIGGER update_updated_at_client
+CREATE TRIGGER update_updated_at_service
 BEFORE UPDATE ON vetlife.service
 FOR EACH ROW
 EXECUTE FUNCTION vetlife.update_updated_at();
@@ -75,7 +75,7 @@ CREATE TABLE vetlife.animal (
 	CONSTRAINT fk_animal_client FOREIGN KEY (id_client) REFERENCES vetlife.client(id) ON DELETE CASCADE
 );
 
-CREATE TRIGGER update_updated_at_client
+CREATE TRIGGER update_updated_at_animal
 BEFORE UPDATE ON vetlife.animal
 FOR EACH ROW
 EXECUTE FUNCTION vetlife.update_updated_at();
@@ -96,7 +96,7 @@ CREATE TABLE vetlife.scheduling (
 	CONSTRAINT fk_scheduling_status FOREIGN KEY (id_status) REFERENCES vetlife.scheduling_status(id) ON DELETE RESTRICT
 );
 
-CREATE TRIGGER update_updated_at_client
+CREATE TRIGGER update_updated_at_scheduling
 BEFORE UPDATE ON vetlife.scheduling
 FOR EACH ROW
 EXECUTE FUNCTION vetlife.update_updated_at();
@@ -116,7 +116,7 @@ CREATE TABLE vetlife.medical_history (
 	CONSTRAINT fk_medical_history_vet FOREIGN KEY (id_vet) REFERENCES vetlife.veterinarian(id) ON DELETE SET NULL
 );
 
-CREATE TRIGGER update_updated_at_client
+CREATE TRIGGER update_updated_at_medical_history
 BEFORE UPDATE ON vetlife.medical_history
 FOR EACH ROW
 EXECUTE FUNCTION vetlife.update_updated_at();
@@ -128,9 +128,9 @@ CREATE TABLE vetlife.user (
 	role VARCHAR(50) NOT NULL,
 	created_at TIMESTAMP DEFAULT NOW(),
 	updated_at TIMESTAMP
-)
+);
 
-CREATE TRIGGER update_updated_at_client
+CREATE TRIGGER update_updated_at_user
 BEFORE UPDATE ON vetlife.user
 FOR EACH ROW
 EXECUTE FUNCTION vetlife.update_updated_at();

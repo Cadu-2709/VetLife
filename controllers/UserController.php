@@ -3,36 +3,28 @@ namespace app\controllers;
 
 use app\models\User;
 use app\models\UserSearch;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
-use yii\filters\AccessControl;
 use Yii;
 
-class UserController extends Controller
+class UserController extends BaseController
 {
-    public function behaviors()
-    {
-        return [
-            'access' => [
-                'class' => AccessControl::class,
-                'rules' => [
-                    [
-                        'allow' => true,
-                        'matchCallback' => function ($rule, $action) {
-                            return !Yii::$app->user->isGuest && Yii::$app->user->identity->role === 'admin';
-                        }
-                    ],
-                ],
-            ],
-            'verbs' => [
-                'class' => VerbFilter::class,
-                'actions' => [
-                    'delete' => ['POST'],
-                ],
-            ],
-        ];
-    }
+    /**
+     * @inheritdoc
+     */
+    protected $permissions = [
+        '*' => 'admin', // Todas as ações requerem role admin
+    ];
+
+    /**
+     * @inheritdoc
+     */
+    protected $customErrorMessages = [
+        'index' => 'Apenas administradores podem visualizar a lista de usuários do sistema.',
+        'view' => 'Apenas administradores podem visualizar detalhes de usuários.',
+        'create' => 'Apenas administradores podem criar novos usuários no sistema.',
+        'update' => 'Apenas administradores podem editar informações de usuários.',
+        'delete' => 'Apenas administradores podem remover usuários do sistema.',
+    ];
 
     public function actionIndex()
     {

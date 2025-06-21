@@ -3,24 +3,32 @@ namespace app\controllers;
 
 use app\models\Scheduling;
 use app\models\SchedulingSearch;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
-use yii\filters\AccessControl;
 use Yii;
 
-class SchedulingController extends Controller
+class SchedulingController extends BaseController
 {
-    public function behaviors()
-    {
-        return [
-            'access' => [
-                'class' => AccessControl::class,
-                'rules' => [['allow' => true, 'roles' => ['@']]],
-            ],
-            'verbs' => ['class' => VerbFilter::class, 'actions' => ['delete' => ['POST']]],
-        ];
-    }
+    /**
+     * @inheritdoc
+     */
+    protected $permissions = [
+        'index' => ['admin', 'receptionist', 'veterinarian', 'client'],
+        'view' => ['admin', 'receptionist', 'veterinarian', 'client'],
+        'create' => ['admin', 'receptionist', 'client'],
+        'update' => ['admin', 'receptionist', 'veterinarian', 'client'],
+        'delete' => ['admin', 'receptionist'],
+    ];
+
+    /**
+     * @inheritdoc
+     */
+    protected $customErrorMessages = [
+        'index' => 'Você não tem permissão para visualizar agendamentos.',
+        'view' => 'Você não tem permissão para visualizar este agendamento.',
+        'create' => 'Você não tem permissão para criar agendamentos. Entre em contacto com a recepção.',
+        'update' => 'Você não tem permissão para editar este agendamento.',
+        'delete' => 'Apenas administradores e recepcionistas podem cancelar agendamentos.',
+    ];
 
     public function actionIndex()
     {
