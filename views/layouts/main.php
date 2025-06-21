@@ -1,4 +1,8 @@
 <?php
+
+/** @var yii\web\View $this */
+/** @var string $content */
+
 use app\assets\AppAsset;
 use app\widgets\Alert;
 use yii\bootstrap5\Breadcrumbs;
@@ -7,9 +11,13 @@ use yii\bootstrap5\Nav;
 use yii\bootstrap5\NavBar;
 
 AppAsset::register($this);
+
 $this->registerCsrfMetaTags();
 $this->registerMetaTag(['charset' => Yii::$app->charset], 'charset');
 $this->registerMetaTag(['name' => 'viewport', 'content' => 'width=device-width, initial-scale=1, shrink-to-fit=no']);
+$this->registerMetaTag(['name' => 'description', 'content' => $this->params['meta_description'] ?? '']);
+$this->registerMetaTag(['name' => 'keywords', 'content' => $this->params['meta_keywords'] ?? '']);
+$this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii::getAlias('@web/favicon.ico')]);
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
@@ -24,12 +32,7 @@ $this->registerMetaTag(['name' => 'viewport', 'content' => 'width=device-width, 
 <header id="header">
     <?php
     NavBar::begin([
-    'brandLabel' => NavBar::begin([
-    'brandLabel' => Html::img('@web/images/logo.png', ['alt' => 'VetLife', 'height' => '40']),
-    'brandUrl' => Yii::$app->homeUrl,
-    'options' => ['class' => 'navbar-expand-md navbar-dark bg-dark fixed-top'],
-]);
-
+        'brandLabel' => 'VetLife',
         'brandUrl' => Yii::$app->homeUrl,
         'options' => ['class' => 'navbar-expand-md navbar-dark bg-dark fixed-top'],
     ]);
@@ -40,7 +43,7 @@ $this->registerMetaTag(['name' => 'viewport', 'content' => 'width=device-width, 
     } else {
         $userRole = Yii::$app->user->identity->role;
         $menuItems = [
-            ['label' => 'Home', 'url' => ['/site/index']],
+            ['label' => 'Dashboard', 'url' => ['/site/index']],
             ['label' => 'Agendamentos', 'url' => ['/scheduling/index']],
             ['label' => 'Animais', 'url' => ['/animal/index']],
             ['label' => 'Histórico Clínico', 'url' => ['/medical-history/index'], 'visible' => ($userRole === 'admin' || $userRole === 'veterinario')],
@@ -59,11 +62,14 @@ $this->registerMetaTag(['name' => 'viewport', 'content' => 'width=device-width, 
         ];
         $menuItems[] = '<li class="nav-item">'
             . Html::beginForm(['/site/logout'])
-            . Html::submitButton('Logout ('.Yii::$app->user->identity->email.')', ['class' => 'nav-link btn btn-link logout text-white'])
+            . Html::submitButton('Logout (' . Yii::$app->user->identity->email . ')', ['class' => 'nav-link btn btn-link logout text-white'])
             . Html::endForm()
             . '</li>';
     }
-    echo Nav::widget(['options' => ['class' => 'navbar-nav ms-auto mb-2 mb-md-0'], 'items' => $menuItems]);
+    echo Nav::widget([
+        'options' => ['class' => 'navbar-nav ms-auto mb-2 mb-md-0'],
+        'items' => $menuItems,
+    ]);
     NavBar::end();
     ?>
 </header>
@@ -79,7 +85,7 @@ $this->registerMetaTag(['name' => 'viewport', 'content' => 'width=device-width, 
 <footer id="footer" class="mt-auto py-3 bg-light">
     <div class="container">
         <div class="row text-muted">
-            <div class="col-md-6 text-center text-md-start">&copy; Unoesc <?= date('Y') ?></div>
+            <div class="col-md-6 text-center text-md-start">&copy; VetLife <?= date('Y') ?></div>
             <div class="col-md-6 text-center text-md-end"><?= Yii::powered() ?></div>
         </div>
     </div>
@@ -88,4 +94,4 @@ $this->registerMetaTag(['name' => 'viewport', 'content' => 'width=device-width, 
 <?php $this->endBody() ?>
 </body>
 </html>
-<?php $this->endPage() ?>
+<?php $this->endPage() ?>
