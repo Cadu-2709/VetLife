@@ -2,103 +2,102 @@
 
 namespace app\models;
 
-class User extends \yii\base\BaseObject implements \yii\web\IdentityInterface
+use Yii;
+use yii\db\ActiveRecord;
+use yii\web\IdentityInterface;
+use yii\behaviors\TimestampBehavior;
+use yii\db\Expression;
+
+/**
+ * This is the model class for table "vetlife.user".
+ *
+ * @property int $id
+ * @property string $email
+ * @property string $pwd_hash
+ * @property string $role
+ * @property string|null $created_at
+ * @property string|null $updated_at
+ */
+class User extends ActiveRecord implements IdentityInterface
 {
-    public $id;
-    public $username;
-    public $password;
-    public $authKey;
-    public $accessToken;
+    public static function tableName()
+    {
+        return 'vetlife.user';
+    }
 
-    private static $users = [
-        '100' => [
-            'id' => '100',
-            'username' => 'admin',
-            'password' => 'admin',
-            'authKey' => 'test100key',
-            'accessToken' => '100-token',
-        ],
-        '101' => [
-            'id' => '101',
-            'username' => 'demo',
-            'password' => 'demo',
-            'authKey' => 'test101key',
-            'accessToken' => '101-token',
-        ],
-    ];
+    public function behaviors()
+    {
+        return [
+            [
+                'class' => TimestampBehavior::class,
+                'attributes' => [
+                    ActiveRecord::EVENT_BEFORE_INSERT => ['created_at', 'updated_at'],
+                    ActiveRecord::EVENT_BEFORE_UPDATE => ['updated_at'],
+                ],
+                'value' => new Expression('NOW()'),
+            ],
+        ];
+    }
 
+    public function rules()
+    {
+        return [
+            [['email', 'pwd_hash', 'role'], 'required'],
+            [['email'], 'string', 'max' => 100],
+            [['pwd_hash'], 'string', 'max' => 255],
+            [['role'], 'string', 'max' => 50],
+            [['email'], 'unique'],
+            ['email', 'email'],
+        ];
+    }
 
-    /**
-     * {@inheritdoc}
-     */
+    public function attributeLabels()
+    {
+        return [
+            'id' => 'ID',
+            'email' => 'E-mail',
+            'pwd_hash' => 'Hash da Senha',
+            'role' => 'Função',
+            'created_at' => 'Criado em',
+            'updated_at' => 'Atualizado em',
+        ];
+    }
+
+    // Métodos da IdentityInterface para Autenticação
     public static function findIdentity($id)
     {
-        return isset(self::$users[$id]) ? new static(self::$users[$id]) : null;
+        return static::findOne($id);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function findIdentityByAccessToken($token, $type = null)
     {
-        foreach (self::$users as $user) {
-            if ($user['accessToken'] === $token) {
-                return new static($user);
-            }
-        }
-
-        return null;
+        return null; // Não usaremos token de acesso neste projeto
     }
 
-    /**
-     * Finds user by username
-     *
-     * @param string $username
-     * @return static|null
-     */
-    public static function findByUsername($username)
-    {
-        foreach (self::$users as $user) {
-            if (strcasecmp($user['username'], $username) === 0) {
-                return new static($user);
-            }
-        }
 
-        return null;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getId()
     {
         return $this->id;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAuthKey()
     {
-        return $this->authKey;
+        return null; // Não usaremos "auth key" neste projeto
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function validateAuthKey($authKey)
     {
-        return $this->authKey === $authKey;
+        return false; // Não usaremos "auth key" neste projeto
     }
 
-    /**
-     * Validates password
-     *
-     * @param string $password password to validate
-     * @return bool if password provided is valid for current user
-     */
+    // Métodos para gestão da senha
+    public function setPassword($password)
+    {
+        $this->pwd_hash = Yii::$app->security->generatePasswordHash($password);
+    }
+
     public function validatePassword($password)
     {
-        return $this->password === $password;
+        return Yii::$app->security->validatePassword($password, $this->pwd_hash);
     }
 }
